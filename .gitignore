@@ -1,0 +1,10 @@
+dist
+node_modules
+.DS_Store
+.npmrc
+*.log
+.vscode
+coverage
+package-lock.json
+test/tmp
+.env

@@ -1,0 +1,23 @@
+{
+  "name": "github-now-playing",
+  "description": "Display the song you are currently listening to on your Github profile",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "bin": "dist/cli/index.js",
+  "repository": "wsmd/github-now-playing",
+  "author": "Waseem Dahman <dwaseem@icloud.com>",
+  "license": "MIT",
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100
+  },
+  "dependencies": {
+    "github-profile-status": "^0.3.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/request-promise": "^4.1.42"
+  }
+}
