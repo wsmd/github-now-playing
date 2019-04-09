@@ -1,8 +1,6 @@
-import { EventEmitter } from 'events';
 import { GitHubProfileStatus } from 'github-profile-status';
 import { NowPlayingMonitor, NowPlayingMonitorOptions } from './nowPlayingMonitor';
 import { NowPlayingTrack } from './nowPlayingTrack';
-import { SourceProvider } from './sources/sourceProvider';
 import { SimpleEventEmitter } from './utils';
 
 interface StatusPublisherOptions extends NowPlayingMonitorOptions {
@@ -21,7 +19,7 @@ interface Events {
   [Event.Error]: any;
 }
 
-export class NowPlayingStatusPublisher extends SimpleEventEmitter<Events> {
+export class StatusPublisher extends SimpleEventEmitter<Events> {
   public static Events = Event;
 
   private monitor!: NowPlayingMonitor;
@@ -44,7 +42,7 @@ export class NowPlayingStatusPublisher extends SimpleEventEmitter<Events> {
     this.monitor
       .on(NowPlayingMonitor.Events.TrackChanged, this.handleTrackChange)
       .on(NowPlayingMonitor.Events.TrackStopped, this.handleTrackStopped)
-      .on(NowPlayingMonitor.Events.Error, error => this.emit(error));
+      .on(NowPlayingMonitor.Events.Error, error => this.emit(Event.Error, error));
   }
 
   private async handleTrackChange(track: NowPlayingTrack) {

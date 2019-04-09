@@ -22,20 +22,22 @@ interface Events {
 export class NowPlayingMonitor extends SimpleEventEmitter<Events> {
   public static Events = Event;
 
-  private source: SourceProvider;
+  private sourceProvider: SourceProvider;
   private updateFrequency!: number;
   private lastTrack: NowPlayingTrack | null = null;
 
   constructor(private options: NowPlayingMonitorOptions) {
     super();
-    this.source = options.source;
-    this.source.on('error', error => this.emit(NowPlayingMonitor.Events.Error, error));
+    this.sourceProvider = options.source;
+    this.sourceProvider.on(SourceProvider.Events.Error, error =>
+      this.emit(NowPlayingMonitor.Events.Error, error),
+    );
     this.updateFrequency = options.updateFrequency;
     this.checkNowPlaying();
   }
 
   private async checkNowPlaying() {
-    const track = await this.source.getNowPlaying();
+    const track = await this.sourceProvider.getNowPlaying();
     if (this.hasTrackChanged(track)) {
       this.lastTrack = track;
       if (track) {
@@ -48,7 +50,6 @@ export class NowPlayingMonitor extends SimpleEventEmitter<Events> {
   }
 
   private hasTrackChanged(track: NowPlayingTrack | null): boolean {
-    console.log({ last: this.lastTrack, current: track });
     if (this.lastTrack && track) {
       for (const key in track) {
         if ((track as any)[key] !== (this.lastTrack as any)[key]) {

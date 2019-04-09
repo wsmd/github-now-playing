@@ -1,0 +1,18 @@
+#!/usr/bin/env osascript -l JavaScript
+
+function run() {
+  const iTunes = Application('iTunes');
+
+  if (!iTunes.running()) {
+    return null;
+  }
+
+  if (iTunes.playerState() !== 'playing') {
+    return null;
+  }
+
+  return JSON.stringify({
+    artist: iTunes.currentTrack.artist(),
+    title: iTunes.currentTrack.name(),
+  });
+}

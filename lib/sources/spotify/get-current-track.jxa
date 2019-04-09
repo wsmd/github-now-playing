@@ -1,0 +1,18 @@
+#!/usr/bin/env osascript -l JavaScript
+
+function run() {
+  const spotify = Application('Spotify');
+
+  if (!spotify.running()) {
+    return null;
+  }
+
+  if (spotify.playerState() !== 'playing') {
+    return null;
+  }
+
+  return JSON.stringify({
+    artist: spotify.currentTrack.artist(),
+    title: spotify.currentTrack.name(),
+  });
+}
