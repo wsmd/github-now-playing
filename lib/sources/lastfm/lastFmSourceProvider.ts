@@ -1,19 +1,14 @@
-import { EventEmitter } from 'events';
 import query from 'querystring';
 import request from 'request-promise';
 import url from 'url';
-import { SourceProvider } from '../sourceProvider';
+import { NowPlayingSourceProvider } from '../sourceProvider';
 
 interface LastFMSourceProviderOptions {
   apiKey: string;
 }
 
-export class LastFMSourceProvider extends SourceProvider {
-  constructor(private options: LastFMSourceProviderOptions) {
-    super();
-  }
-
-  protected async check() {
+export class LastFMSourceProvider extends NowPlayingSourceProvider<LastFMSourceProviderOptions> {
+  protected async getNowPlaying() {
     const res = await request.get(this.recentTracksUrl, { json: true });
     const track = res.recenttracks.track[0];
     if (track && track['@attr'] && track['@attr'].nowplaying === 'true') {
