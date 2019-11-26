@@ -1,23 +1,46 @@
 {
   "name": "github-now-playing",
-  "description": "Display the song you are currently listening to on your Github profile",
+  "description": "Display what you're currently listening to on your Github profile",
   "version": "0.1.0",
   "main": "dist/index.js",
-  "bin": "dist/cli/index.js",
   "repository": "wsmd/github-now-playing",
   "author": "Waseem Dahman <dwaseem@icloud.com>",
   "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "prebuild": "rm -rf dist",
+    "prepack": "yarn build"
+  },
+  "files": [
+    "dist"
+  ],
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all",
     "printWidth": 100
   },
   "dependencies": {
-    "github-profile-status": "^0.3.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4"
+    "github-profile-status": "^1.0.0",
+    "node-fetch": "^2.6.0",
+    "osascript-tag": "^0.1.2",
+    "yanl": "^0.1.0-beta.0"
   },
   "devDependencies": {
-    "@types/request-promise": "^4.1.42"
-  }
+    "@types/node-fetch": "^2.5.3",
+    "prettier": "^1.19.1",
+    "tslint": "^6.0.0-beta1",
+    "typescript": "^3.7.2"
+  },
+  "keywords": [
+    "music",
+    "nowplaying",
+    "now-playing",
+    "status",
+    "profile",
+    "github",
+    "spotify",
+    "itunes",
+    "last.fm"
+  ]
 }

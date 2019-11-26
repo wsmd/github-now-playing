@@ -1,17 +1,23 @@
-import query from 'querystring';
-import request from 'request-promise';
 import url from 'url';
-import { NowPlayingSourceProvider } from '../sourceProvider';
+import query from 'querystring';
+import fetch from 'node-fetch';
+import { logger } from 'yanl';
+import { SourceProvider } from '../../SourceProvider';
 
-interface LastFMSourceProviderOptions {
+export interface LastFMSourceProviderOptions {
   apiKey: string;
+  user: string;
 }
 
-export class LastFMSourceProvider extends NowPlayingSourceProvider<LastFMSourceProviderOptions> {
+export class LastFMSourceProvider extends SourceProvider<LastFMSourceProviderOptions> {
   protected async getNowPlaying() {
-    const res = await request.get(this.recentTracksUrl, { json: true });
-    const track = res.recenttracks.track[0];
-    if (track && track['@attr'] && track['@attr'].nowplaying === 'true') {
+    const response = await fetch(this.recentTracksUrl);
+    const payload = await response.json();
+
+    logger.debug('api request to last.fm', response.status, response.statusText);
+
+    const track = payload?.recenttracks?.track[0];
+    if (track?.['@attr']?.nowplaying === 'true') {
       return {
         artist: track.artist['#text'],
         title: track.name,
@@ -29,7 +35,7 @@ export class LastFMSourceProvider extends NowPlayingSourceProvider<LastFMSourceP
         api_key: this.options.apiKey,
         format: 'json',
         method: 'user.getrecenttracks',
-        user: 'dwaseem',
+        user: this.options.user,
       }),
     });
   }

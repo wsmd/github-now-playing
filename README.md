@@ -12,7 +12,6 @@
   - [Last.fm](#lastfm)
   - [iTunes](#itunes)
   - [Spotify](#spotify)
-- [Authentication & Security Disclaimer](#authentication--security-disclaimer)
 
 </p>
 </details>
@@ -21,7 +20,7 @@
 
 GitHub recently introduced a [new feature](https://github.blog/changelog/2019-01-09-set-your-status/) that allows users to set a status on their GitHub profile.
 
-I built [`github-profile-status`](https://raw.githubusercontent.com/wsmd/github-profile-status) as a way to update that status programmatically to do all sort of cool stuff. I wanted to put it into use, and I though it would be a cool idea if I could share the music I'm listening to on my GitHub profile!
+I built [`github-profile-status`](https://github.com/wsmd/github-profile-status) as a way to update that status programmatically to do all sort of cool stuff. I wanted to put it into use, and I though it would be a cool idea if I could share the music I'm listening to on my GitHub profile!
 
 It's kind of like #NowPlaying but for GitHub!
 
@@ -35,7 +34,7 @@ It's kind of like #NowPlaying but for GitHub!
 import { GitHubNowPlaying, NowPlayingSources } from 'github-now-playing';
 
 const nowPlaying = new GitHubNowPlaying({
-  sessionCookie: process.env.GITHUB_SESSION_COOKIE,
+  token: process.env.GITHUB_ACCESS_TOKEN,
 });
 
 // NowPlayingSources includes iTunes and Spotify as well
@@ -98,16 +97,6 @@ nowPlaying.source = new NowPlayingSources.Spotify({
 ```
 
 Platforms supported: macOS
-
-## Authentication & Security Disclaimer
-
-I built this tool for my own personal use. Since this functionality is not provided by the GitHub API, there are a few points to highlight regarding authentication and security:
-
-- This tool **does not use any of GitHub's official authentication methods**.
-- This tool requires either the `user_session` cookie from an active login session of the user account or the user basic login information: username and password.
-- This tool uses this information to imitate a user login via `https://github.com` and perform a status update/check.
-- **It is highly encouraged that you provide this information using environment variables**, and not include them in your code.
-- While this tool **does not persist or share** any of the information provided, it is very important that you are aware of this limitation. Please use at your own risk.
 
 # License
 

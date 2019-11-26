@@ -1,12 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "incremental": true,
+    "target": "es2017",
     "module": "commonjs",
-    "lib": ["es2016"],
+    "lib": ["es2016", "dom"],
     "strict": true,
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "keyofStringsOnly": true,
+    "paths": {
+      "lib/*": ["lib/*"]
+    }
   },
   "include": ["lib"],
   "exclude": ["node_modules", "dist"]
