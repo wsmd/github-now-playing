@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SpotifySourceProvider calls osascript.jxa with correct script 1`] = `
+Array [
+  Array [
+    "
+      const spotify = Application('Spotify');
+
+      if (!spotify.running()) {
+        return null;
+      }
+
+      if (spotify.playerState() !== 'playing') {
+        return null;
+      }
+
+      return {
+        artist: spotify.currentTrack.artist(),
+        title: spotify.currentTrack.name(),
+      }
+    ",
+  ],
+]
+`;

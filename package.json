@@ -10,7 +10,12 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "prebuild": "rm -rf dist",
-    "prepack": "yarn build"
+    "prepack": "yarn build",
+    "lint": "tslint --project .",
+    "test": "jest",
+    "test:all": "yarn typecheck && yarn lint && yarn test:coverage",
+    "test:coverage": "jest --coverage --verbose",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls"
   },
   "files": [
     "dist"
@@ -27,8 +32,12 @@
     "yanl": "^0.1.0-beta.0"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.23",
     "@types/node-fetch": "^2.5.3",
+    "coveralls": "^3.0.9",
+    "jest": "^24.9.0",
     "prettier": "^1.19.1",
+    "ts-jest": "^24.2.0",
     "tslint": "^6.0.0-beta1",
     "typescript": "^3.7.2"
   },

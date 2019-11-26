@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ITunesSourceProvider calls osascript.jxa with correct script 1`] = `
+Array [
+  Array [
+    "
+      const iTunes = Application('iTunes');
+
+      if (!iTunes.running()) {
+        return null;
+      }
+
+      if (iTunes.playerState() !== 'playing') {
+        return null;
+      }
+
+      return {
+        artist: iTunes.currentTrack.artist(),
+        title: iTunes.currentTrack.name(),
+      };
+    ",
+  ],
+]
+`;
