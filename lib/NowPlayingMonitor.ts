@@ -4,6 +4,12 @@ import { SourceProvider } from './SourceProvider';
 import { SimpleEventEmitter } from './SimpleEventEmitter';
 import { NowPlayingTrack, NowPlayingStatus, StatusPublisher } from './types';
 
+enum State {
+  Listening,
+  Stopping,
+  Stopped,
+}
+
 enum Events {
   Error = 'error',
   ListenStart = 'listen-start',
@@ -36,6 +42,8 @@ export class NowPlayingMonitor<Status extends NowPlayingStatus> extends SimpleEv
 
   private sourceProvider: SourceProvider | null = null;
 
+  private state: State = State.Stopped;
+
   constructor(private statusPublisher: StatusPublisher) {
     super();
   }
@@ -45,6 +53,13 @@ export class NowPlayingMonitor<Status extends NowPlayingStatus> extends SimpleEv
    */
   public listen(): void {
     assertIsDefined(this.sourceProvider, 'Expected source to be specified');
+
+    // istanbul ignore if
+    if (this.state === State.Listening) {
+      return;
+    }
+
+    this.state = State.Listening;
     this.sourceProvider.listen();
     this.emit(Events.ListenStart);
   }
@@ -55,8 +70,16 @@ export class NowPlayingMonitor<Status extends NowPlayingStatus> extends SimpleEv
    */
   public async stop(): Promise<void> {
     assertIsDefined(this.sourceProvider, 'Expected source to be specified');
+
+    // istanbul ignore if
+    if (this.state === State.Stopped || this.state === State.Stopping) {
+      return;
+    }
+
+    this.state = State.Stopping;
     this.sourceProvider.stop();
     await this.cleanUp();
+    this.state = State.Stopped;
     this.emit(Events.ListenStop);
   }
 

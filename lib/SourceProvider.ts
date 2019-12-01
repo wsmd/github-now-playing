@@ -2,6 +2,11 @@ import { logger } from 'yanl';
 import { NowPlayingTrack } from './types';
 import { SimpleEventEmitter } from './SimpleEventEmitter';
 
+enum State {
+  Listening,
+  Stopped,
+}
+
 enum Events {
   Error = 'error',
   TrackChanged = 'track-changed',
@@ -17,7 +22,7 @@ type EventListeners = {
 export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventListeners> {
   public static Events = Events;
 
-  private listening: boolean = false;
+  private state: State = State.Stopped;
 
   private nextCheckTimeout!: NodeJS.Timeout;
 
@@ -27,20 +32,24 @@ export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventLis
     super();
   }
 
+  public isListening(): boolean {
+    return this.state === State.Listening;
+  }
+
   public listen(): void {
+    // istanbul ignore if
+    if (this.isListening()) {
+      return;
+    }
     logger.debug('started listening from source');
-    this.listening = true;
+    this.state = State.Listening;
     this.checkNowPlaying();
   }
 
   public stop(): void {
     logger.debug('stopped listening from source');
-    this.listening = false;
+    this.state = State.Stopped;
     clearTimeout(this.nextCheckTimeout);
-  }
-
-  public isListening(): boolean {
-    return this.listening;
   }
 
   protected getNowPlaying(): Promise<NowPlayingTrack | null> {
@@ -59,7 +68,7 @@ export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventLis
     }
 
     // bail out in case the source provider has been stopped while the check was pending
-    if (!this.listening) {
+    if (this.state === State.Stopped) {
       return;
     }
 
