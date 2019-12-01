@@ -11,7 +11,7 @@
     "build": "tsc",
     "prebuild": "rm -rf dist",
     "prepack": "yarn build",
-    "lint": "tslint --project .",
+    "lint": "eslint . --ext .ts",
     "test": "jest",
     "test:all": "yarn typecheck && yarn lint && yarn test:coverage",
     "test:coverage": "jest --coverage --verbose",
@@ -34,7 +34,9 @@
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "@types/node-fetch": "^2.5.3",
+    "@wsmd/eslint-config": "1.1.0",
     "coveralls": "^3.0.9",
+    "eslint": "^6.7.1",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",
     "ts-jest": "^24.2.0",

@@ -3,7 +3,7 @@ import { SourceProvider } from '../../SourceProvider';
 import { NowPlayingTrack } from '../../types';
 
 export class SpotifySourceProvider extends SourceProvider {
-  protected getNowPlaying() {
+  protected getNowPlaying(): Promise<NowPlayingTrack | null> {
     return osascript.jxa<NowPlayingTrack | null>({ parse: true })`
       const spotify = Application('Spotify');
 

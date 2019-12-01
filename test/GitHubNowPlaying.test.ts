@@ -5,6 +5,13 @@ import { SourceProvider } from 'lib/SourceProvider';
 import { NowPlayingSources } from 'lib/sources';
 import { runNextUpdateTick } from './__helpers__/utils';
 
+function createConcreteSourceProvider(expectedTrack: { current: any }) {
+  class ConcreteSourceProvider extends SourceProvider {
+    protected getNowPlaying = async () => expectedTrack.current;
+  }
+  return new ConcreteSourceProvider({ updateFrequency: 1 });
+}
+
 jest.mock('github-profile-status');
 
 beforeEach(() => {
@@ -67,10 +74,3 @@ describe('GitHubNowPlaying', () => {
     expect(profileStatusInstance.clear).toHaveBeenCalled();
   });
 });
-
-function createConcreteSourceProvider(expectedTrack: { current: any }) {
-  class ConcreteSourceProvider extends SourceProvider {
-    protected getNowPlaying = async () => expectedTrack.current;
-  }
-  return new ConcreteSourceProvider({ updateFrequency: 1 });
-}

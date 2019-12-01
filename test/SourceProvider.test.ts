@@ -143,7 +143,6 @@ describe('SourceProvider', () => {
   });
 
   it('throws if checkNowPlayingMethod is not implemented', () => {
-    // tslint:disable-next-line: max-classes-per-file
     class ConcreteSourceProvider extends SourceProvider {}
     const onErrorFn = jest.fn();
     const source = new ConcreteSourceProvider({ updateFrequency: 1 });

@@ -2,46 +2,48 @@ import assert from 'assert';
 import { logger } from 'yanl';
 import { SourceProvider } from './SourceProvider';
 import { SimpleEventEmitter } from './SimpleEventEmitter';
-import { NowPlayingTrack, NowPlayingStatus as Status, StatusPublisher } from './types';
+import { NowPlayingTrack, NowPlayingStatus, StatusPublisher } from './types';
 
 enum Events {
-  StatusUpdated = 'status-updated',
-  StatusCleared = 'status-cleared',
+  Error = 'error',
   ListenStart = 'listen-start',
   ListenStop = 'listen-stop',
-  Error = 'error',
+  StatusCleared = 'status-cleared',
+  StatusUpdated = 'status-updated',
 }
 
-type EventListeners<S> = {
-  [Events.Error](error: any): void;
+type EventListeners<Status> = {
+  [Events.Error](error: unknown): void;
   [Events.ListenStart](): void;
   [Events.ListenStop](): void;
   [Events.StatusCleared](): void;
-  [Events.StatusUpdated](status: S | null): void;
+  [Events.StatusUpdated](status: Status | null): void;
 };
 
-export class NowPlayingMonitor<S extends Status> extends SimpleEventEmitter<EventListeners<S>> {
+function assertIsDefined<T>(value: T, message: string): asserts value is NonNullable<T> {
+  assert(value != null, message);
+}
+
+export class NowPlayingMonitor<Status extends NowPlayingStatus> extends SimpleEventEmitter<
+  EventListeners<Status>
+> {
   /**
    * A dictionary containing event names for a GitHubNowPlaying instance
    */
   public static Events = Events;
-  /**
-   * Indicates whether the profile status has been updated and not reset.
-   */
+
   private isStatusDirty: boolean = false;
-  /**
-   * The source provider instance watching for track changes
-   */
+
   private sourceProvider: SourceProvider | null = null;
 
-  constructor(private profileStatus: StatusPublisher) {
+  constructor(private statusPublisher: StatusPublisher) {
     super();
   }
 
   /**
    * Listens to track changes using the provided source.
    */
-  public listen() {
+  public listen(): void {
     assertIsDefined(this.sourceProvider, 'Expected source to be specified');
     this.sourceProvider.listen();
     this.emit(Events.ListenStart);
@@ -51,7 +53,7 @@ export class NowPlayingMonitor<S extends Status> extends SimpleEventEmitter<Even
    * Stop listening to track changes using the provided source. Calling this
    * will clear the profile status if it has been already updated.
    */
-  public async stop() {
+  public async stop(): Promise<void> {
     assertIsDefined(this.sourceProvider, 'Expected source to be specified');
     this.sourceProvider.stop();
     await this.cleanUp();
@@ -61,16 +63,16 @@ export class NowPlayingMonitor<S extends Status> extends SimpleEventEmitter<Even
   /**
    * Sets a source from which the currently playing track will be retrieved.
    */
-  public setSource(source: SourceProvider) {
+  public setSource(source: SourceProvider): void {
     let autoStartNextSource = false;
     if (this.sourceProvider) {
-      autoStartNextSource = this.sourceProvider.isListening;
+      autoStartNextSource = this.sourceProvider.isListening();
       this.unsetSourceProvider();
     }
     this.setSourceProvider(source, autoStartNextSource);
   }
 
-  private setSourceProvider(source: SourceProvider, autoStart: boolean) {
+  private setSourceProvider(source: SourceProvider, autoStart: boolean): void {
     this.sourceProvider = source;
     this.sourceProvider
       .on(SourceProvider.Events.TrackChanged, this.updateStatus.bind(this))
@@ -81,28 +83,29 @@ export class NowPlayingMonitor<S extends Status> extends SimpleEventEmitter<Even
     }
   }
 
-  private unsetSourceProvider() {
-    this.sourceProvider!.stop();
-    this.sourceProvider!.removeAllListeners();
+  private unsetSourceProvider(): void {
+    assertIsDefined(this.sourceProvider, 'Expected source to be specified');
+    this.sourceProvider.stop();
+    this.sourceProvider.removeAllListeners();
   }
 
-  private async updateStatus(track: NowPlayingTrack) {
+  private async updateStatus(track: NowPlayingTrack): Promise<void> {
     try {
-      const status = await this.profileStatus.set({
+      const status = await this.statusPublisher.set({
         emoji: ':musical_note:',
         message: `is listening to "${track.title}" by ${track.artist}`,
       });
       this.isStatusDirty = true;
-      this.emit(Events.StatusUpdated, status as S);
+      this.emit(Events.StatusUpdated, status as Status);
     } catch (error) {
       this.emitError(error);
     }
   }
 
-  private async clearStatus() {
+  private async clearStatus(): Promise<void> {
     try {
       logger.debug('clearing the profile status');
-      await this.profileStatus.clear();
+      await this.statusPublisher.clear();
       this.isStatusDirty = false;
       this.emit(Events.StatusCleared);
     } catch (error) {
@@ -110,17 +113,13 @@ export class NowPlayingMonitor<S extends Status> extends SimpleEventEmitter<Even
     }
   }
 
-  private emitError(error: any) {
+  private emitError(error: {}): void {
     this.emit(Events.Error, error);
   }
 
-  private async cleanUp() {
+  private async cleanUp(): Promise<void> {
     if (this.isStatusDirty) {
       await this.clearStatus();
     }
   }
-}
-
-function assertIsDefined<T>(value: T, message: string): asserts value is NonNullable<T> {
-  assert(value != null, message);
 }

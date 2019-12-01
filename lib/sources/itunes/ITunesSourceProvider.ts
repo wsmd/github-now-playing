@@ -3,7 +3,7 @@ import { SourceProvider } from '../../SourceProvider';
 import { NowPlayingTrack } from '../../types';
 
 export class ITunesSourceProvider extends SourceProvider {
-  protected getNowPlaying() {
+  protected getNowPlaying(): Promise<NowPlayingTrack | null> {
     return osascript.jxa<NowPlayingTrack | null>({ parse: true })`
       const iTunes = Application('iTunes');
 

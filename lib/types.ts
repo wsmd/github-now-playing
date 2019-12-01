@@ -1,10 +1,12 @@
+import { UserStatus } from 'github-profile-status';
+
 export interface NowPlayingTrack {
   title: string;
   artist: string;
 }
 
 export interface NowPlayingStatus {
-  emoji: any;
+  emoji: UserStatus['emoji'];
   message: string | null;
 }
 

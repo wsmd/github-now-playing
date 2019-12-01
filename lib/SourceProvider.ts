@@ -9,49 +9,48 @@ enum Events {
 }
 
 type EventListeners = {
-  [Events.Error](error: any): void;
+  [Events.Error](error: unknown): void;
   [Events.TrackChanged](track: NowPlayingTrack): void;
   [Events.TrackStopped](): void;
 };
 
 export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventListeners> {
-  /**
-   * A dictionary containing event names for a SourceProvider instance
-   */
   public static Events = Events;
-  /**
-   * Indicates whether the instance is currently listening to a source provider.
-   */
-  public isListening: boolean = false;
-  private timeout!: NodeJS.Timeout;
+
+  private listening: boolean = false;
+
+  private nextCheckTimeout!: NodeJS.Timeout;
+
   private lastTrack: NowPlayingTrack | null = null;
 
   constructor(protected options: T & { updateFrequency: number }) {
     super();
   }
 
-  public listen() {
-    logger.debug('started listening');
-    this.isListening = true;
+  public listen(): void {
+    logger.debug('started listening from source');
+    this.listening = true;
     this.checkNowPlaying();
   }
 
-  public stop() {
+  public stop(): void {
     logger.debug('stopped listening from source');
-    this.isListening = false;
-    clearTimeout(this.timeout);
+    this.listening = false;
+    clearTimeout(this.nextCheckTimeout);
   }
 
-  /* private */
+  public isListening(): boolean {
+    return this.listening;
+  }
 
   protected getNowPlaying(): Promise<NowPlayingTrack | null> {
-    throw new Error('Method not implemented');
+    throw new Error(`Method \`getNowPlaying\` is not implemented in ${this.constructor.name}`);
   }
 
-  private async checkNowPlaying() {
+  private async checkNowPlaying(): Promise<void> {
     logger.debug('checking source for now playing track');
 
-    let track;
+    let track = null;
     try {
       track = await this.getNowPlaying();
     } catch (error) {
@@ -59,9 +58,8 @@ export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventLis
       return;
     }
 
-    // bail from reporting track changes or scheduling the next check in case
-    // it has source provider has been stopped during the pending check
-    if (!this.isListening) {
+    // bail out in case the source provider has been stopped while the check was pending
+    if (!this.listening) {
       return;
     }
 
@@ -74,19 +72,16 @@ export abstract class SourceProvider<T = {}> extends SimpleEventEmitter<EventLis
       this.lastTrack = track;
     }
 
-    this.timeout = setTimeout(() => this.checkNowPlaying(), this.options.updateFrequency);
+    this.nextCheckTimeout = setTimeout(() => this.checkNowPlaying(), this.options.updateFrequency);
     logger.debug('scheduled next source check');
   }
 
   private hasTrackChanged(track: NowPlayingTrack | null): boolean {
-    if (this.lastTrack && track) {
-      for (const key in track) {
-        if ((track as any)[key] !== (this.lastTrack as any)[key]) {
-          return true;
-        }
-      }
-      return false;
+    const { lastTrack } = this;
+    if (lastTrack == null || track == null) {
+      return lastTrack !== track;
     }
-    return this.lastTrack !== track;
+    const keys = Object.keys(track) as Array<keyof NowPlayingTrack>;
+    return keys.some(key => track[key] !== lastTrack[key]);
   }
 }

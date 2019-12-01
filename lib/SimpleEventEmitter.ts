@@ -5,7 +5,7 @@ type ListenersMap = {
   [event: string]: (...args: any[]) => void;
 };
 
-export abstract class SimpleEventEmitter<Listeners extends ListenersMap = ListenersMap> {
+export class SimpleEventEmitter<Listeners extends ListenersMap = ListenersMap> {
   private emitter = new EventEmitter();
 
   public on<E extends keyof Listeners>(event: E, listener: Listeners[E]): this {
@@ -19,7 +19,7 @@ export abstract class SimpleEventEmitter<Listeners extends ListenersMap = Listen
     return this;
   }
 
-  public removeAllListeners(event?: string) {
+  public removeAllListeners(event?: string): this {
     this.emitter.removeAllListeners(event);
     return this;
   }

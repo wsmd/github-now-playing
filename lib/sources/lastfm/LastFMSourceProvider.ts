@@ -3,6 +3,7 @@ import query from 'querystring';
 import fetch from 'node-fetch';
 import { logger } from 'yanl';
 import { SourceProvider } from '../../SourceProvider';
+import { NowPlayingTrack } from '../../types';
 
 export interface LastFMSourceProviderOptions {
   apiKey: string;
@@ -10,7 +11,7 @@ export interface LastFMSourceProviderOptions {
 }
 
 export class LastFMSourceProvider extends SourceProvider<LastFMSourceProviderOptions> {
-  protected async getNowPlaying() {
+  protected async getNowPlaying(): Promise<NowPlayingTrack | null> {
     const response = await fetch(this.recentTracksUrl);
     const payload = await response.json();
 
