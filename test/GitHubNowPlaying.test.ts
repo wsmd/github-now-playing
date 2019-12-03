@@ -45,7 +45,7 @@ describe('GitHubNowPlaying', () => {
     expect(GitHubNowPlaying.Sources).toEqual({
       Spotify: NowPlayingSources.Spotify,
       LastFM: NowPlayingSources.LastFM,
-      iTunes: NowPlayingSources.iTunes,
+      ITunes: NowPlayingSources.ITunes,
     });
   });
 

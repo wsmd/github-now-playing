@@ -4,7 +4,7 @@ import { SpotifySourceProvider } from './spotify/SpotifySourceProvider';
 
 const NowPlayingSources = {
   LastFM: LastFMSourceProvider,
-  iTunes: ITunesSourceProvider,
+  ITunes: ITunesSourceProvider,
   Spotify: SpotifySourceProvider,
 };
 

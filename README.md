@@ -33,7 +33,7 @@
       - [`nowPlaying.stop()`](#nowplayingstop)
   - [Sources Providers: `GitHubNowPlaying.Sources`](#sources-providers-githubnowplayingsources)
     - [`LastFM`](#lastfm)
-    - [`iTunes`](#itunes)
+    - [`ITunes`](#itunes)
     - [`Spotify`](#spotify)
   - [Events: `GitHubNowPlaying.Events`](#events-githubnowplayingevents)
     - [`Error`](#error)
@@ -185,12 +185,12 @@ const lastFmSource = new GitHubNowPlaying.Sources.LastFM({
 nowPlaying.setSource(lastFmSource);
 ```
 
-#### `iTunes`
+#### `ITunes`
 
 Fetches information about the currently-playing track in [iTunes](https://www.apple.com/itunes/).
 
 ```js
-const iTunesSource = new GitHubNowPlaying.Sources.iTunes({
+const iTunesSource = new GitHubNowPlaying.Sources.ITunes({
  updateFrequency: 1000,
 });
 
