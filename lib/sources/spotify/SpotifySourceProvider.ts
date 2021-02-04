@@ -18,6 +18,7 @@ export class SpotifySourceProvider extends SourceProvider {
       return {
         artist: spotify.currentTrack.artist(),
         title: spotify.currentTrack.name(),
+
       }
     `;
   }
