@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "github-profile-status": "^1.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "osascript-tag": "^0.1.2",
     "yanl": "^0.1.0-beta.0"
   },
